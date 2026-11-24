@@ -67,7 +67,11 @@ fun CareReminderNavGraph() {
 
         composable<HomeRoute> {
 
-            HomeScreen()
+            HomeScreen(
+
+                onAddTaskClick = {
+                }
+            )
         }
     }
 }
