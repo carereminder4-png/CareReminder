@@ -2,7 +2,7 @@ package com.carereminder.app.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carereminder.app.data.BackendService
+import com.carereminder.app.data.remote.BackendService
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -2,7 +2,7 @@ package com.carereminder.app.presentation.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carereminder.app.data.BackendService
+import com.carereminder.app.data.remote.BackendService
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.delay
