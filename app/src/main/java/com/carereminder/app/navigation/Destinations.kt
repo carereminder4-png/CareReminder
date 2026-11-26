@@ -10,3 +10,6 @@ object AuthRoute
 
 @Serializable
 object HomeRoute
+
+@Serializable
+object AddTaskRoute

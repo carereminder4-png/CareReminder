@@ -70,6 +70,7 @@ fun CareReminderNavGraph() {
             HomeScreen(
 
                 onAddTaskClick = {
+                    navController.navigate(AddTaskRoute)
                 }
             )
         }
