@@ -19,14 +19,17 @@ class HomeViewModel : ViewModel() {
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        loadTasks()
+        refreshTasks()
     }
 
-    private fun loadTasks() {
+    fun refreshTasks() {
+
         val userId = BackendService.currentUserId() ?: return
 
         viewModelScope.launch {
+
             repository.observeTasks(userId).collect { tasks ->
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -38,11 +41,16 @@ class HomeViewModel : ViewModel() {
     }
 
     fun toggleTaskCompletion(task: Task) {
+
         viewModelScope.launch {
+
             repository.updateTask(
-                task.copy(completed = !task.completed)
+                task.copy(
+                    completed = !task.completed
+                )
             )
-            loadTasks()
+
+            refreshTasks()
         }
     }
 }

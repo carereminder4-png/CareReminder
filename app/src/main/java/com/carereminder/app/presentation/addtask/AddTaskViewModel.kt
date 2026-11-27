@@ -18,34 +18,94 @@ class AddTaskViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AddTaskUiState())
     val uiState: StateFlow<AddTaskUiState> = _uiState.asStateFlow()
 
-    fun updateTitle(value: String) {
-        _uiState.value = _uiState.value.copy(title = value)
-    }
+    private var loadedTaskId: String? = null
 
-    fun updateTaskType(type: TaskType) {
-        _uiState.value = _uiState.value.copy(taskType = type)
-    }
+    fun loadTask(taskId: String?) {
 
-    fun updateReminderTime(time: Long) {
-        _uiState.value = _uiState.value.copy(reminderTime = time)
-    }
+        if (taskId == null) return
 
-    fun saveTask(onSaved: () -> Unit) {
+        if (loadedTaskId == taskId) return
 
-        val state = _uiState.value
+        loadedTaskId = taskId
 
         viewModelScope.launch {
 
-            repository.addTask(
-                Task(
-                    userId = BackendService.currentUserId() ?: "",
-                    title = state.title,
-                    type = state.taskType,
-                    reminderTime = state.reminderTime
-                )
+            val task = repository.getTask(taskId)
+                ?: return@launch
+
+            _uiState.value = _uiState.value.copy(
+                title = task.title,
+                taskType = task.type,
+                reminderTime = task.reminderTime
             )
+        }
+    }
+
+    fun updateTitle(value: String) {
+        _uiState.value = _uiState.value.copy(
+            title = value
+        )
+    }
+
+    fun updateTaskType(type: TaskType) {
+        _uiState.value = _uiState.value.copy(
+            taskType = type
+        )
+    }
+
+    fun updateReminderTime(time: Long) {
+        _uiState.value = _uiState.value.copy(
+            reminderTime = time
+        )
+    }
+
+    fun saveTask(
+        taskId: String?,
+        onSaved: () -> Unit
+    ) {
+
+        viewModelScope.launch {
+
+            if (taskId == null) {
+
+                repository.addTask(
+                    Task(
+                        userId = BackendService.currentUserId() ?: "",
+                        title = uiState.value.title,
+                        type = uiState.value.taskType,
+                        reminderTime = uiState.value.reminderTime
+                    )
+                )
+
+            } else {
+
+                repository.updateTask(
+                    Task(
+                        id = taskId,
+                        userId = BackendService.currentUserId() ?: "",
+                        title = uiState.value.title,
+                        type = uiState.value.taskType,
+                        reminderTime = uiState.value.reminderTime
+                    )
+                )
+            }
 
             onSaved()
+        }
+    }
+
+    fun deleteTask(
+        taskId: String?,
+        onDeleted: () -> Unit
+    ) {
+
+        val id = taskId ?: return
+
+        viewModelScope.launch {
+
+            repository.deleteTask(id)
+
+            onDeleted()
         }
     }
 }

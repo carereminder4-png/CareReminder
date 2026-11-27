@@ -6,14 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.carereminder.app.domain.model.Task
+import java.util.Locale.getDefault
 
 @Composable
 fun TaskCard(
     task: Task,
-    onToggleComplete: () -> Unit
+    onToggleComplete: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onEditClick
     ) {
         Row(
             modifier = Modifier
@@ -33,7 +36,7 @@ fun TaskCard(
                 Text(
                     text = "Time: ${
                         java.text.SimpleDateFormat(
-                            "hh:mm a"
+                            "MMM dd, yyyy h:mm a", getDefault()
                         ).format(task.reminderTime)
                     }"
                 )

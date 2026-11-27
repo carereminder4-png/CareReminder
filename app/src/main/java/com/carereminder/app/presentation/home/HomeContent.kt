@@ -26,7 +26,8 @@ import com.carereminder.app.ui.theme.CareReminderTheme
 fun HomeContent(
     state: HomeUiState,
     onAddTaskClick: () -> Unit,
-    onToggleComplete: (Task) -> Unit
+    onToggleComplete: (Task) -> Unit,
+    onEditTask: (String) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -64,9 +65,16 @@ fun HomeContent(
 
             else -> {
 
-                val todayTasks = state.tasks.filter { !it.completed }
+                val calendar = java.util.Calendar.getInstance()
+                calendar.set(java.util.Calendar.HOUR_OF_DAY, 23)
+                calendar.set(java.util.Calendar.MINUTE, 59)
+                calendar.set(java.util.Calendar.SECOND, 59)
+                val endOfToday = calendar.timeInMillis
 
-                val upcomingTasks = state.tasks.filter { it.completed }
+                val completedTasks = state.tasks.filter { it.completed }
+                val activeTasks = state.tasks.filter { !it.completed }
+                val todayTasks = activeTasks.filter { it.reminderTime <= endOfToday || it.reminderTime == 0L }
+                val upcomingTasks = activeTasks.filter { it.reminderTime > endOfToday && it.reminderTime != 0L }
 
                 LazyColumn(
                     modifier = Modifier
@@ -76,40 +84,69 @@ fun HomeContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 
-                    item {
-                        Text(
-                            text = "Today's Tasks",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
+                    if (todayTasks.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Today's Tasks",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
+
+                        items(todayTasks) { task ->
+                            TaskCard(
+                                task = task,
+                                onToggleComplete = {
+                                    onToggleComplete(task)
+                                },
+                                onEditClick = {
+                                    onEditTask(task.id)
+                                }
+                            )
+                        }
                     }
 
-                    items(todayTasks) { task ->
-                        TaskCard(
-                            task = task,
-                            onToggleComplete = {
-                                onToggleComplete(task)
-                            }
-                        )
+                    if (upcomingTasks.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Upcoming Reminders",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
+
+                        items(upcomingTasks) { task ->
+                            TaskCard(
+                                task = task,
+                                onToggleComplete = {
+                                    onToggleComplete(task)
+                                },
+                                onEditClick = {
+                                    onEditTask(task.id)
+                                }
+                            )
+                        }
                     }
 
-                    item {
-                        Spacer(
-                            modifier = Modifier.height(16.dp)
-                        )
+                    if (completedTasks.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Completed Tasks",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
 
-                        Text(
-                            text = "Upcoming Reminders",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
-
-                    items(upcomingTasks) { task ->
-                        TaskCard(
-                            task = task,
-                            onToggleComplete = {
-                                onToggleComplete(task)
-                            }
-                        )
+                        items(completedTasks) { task ->
+                            TaskCard(
+                                task = task,
+                                onToggleComplete = {
+                                    onToggleComplete(task)
+                                },
+                                onEditClick = {
+                                    onEditTask(task.id)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -144,7 +181,8 @@ fun HomePreviewLight() {
                 )
             ),
             onAddTaskClick = {},
-            onToggleComplete = {}
+            onToggleComplete = {},
+            onEditTask = {}
         )
     }
 }
@@ -176,7 +214,25 @@ fun HomePreviewDark() {
                 )
             ),
             onAddTaskClick = {},
-            onToggleComplete = {}
+            onToggleComplete = {},
+            onEditTask = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeLoadingPreview() {
+
+    CareReminderTheme {
+
+        HomeContent(
+            state = HomeUiState(
+                isLoading = true
+            ),
+            onAddTaskClick = {},
+            onToggleComplete = {},
+            onEditTask = {}
         )
     }
 }

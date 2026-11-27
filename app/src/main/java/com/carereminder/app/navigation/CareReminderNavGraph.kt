@@ -5,6 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.carereminder.app.presentation.addtask.AddTaskScreen
 import com.carereminder.app.presentation.auth.AuthScreen
 import com.carereminder.app.presentation.home.HomeScreen
 import com.carereminder.app.presentation.splash.SplashScreen
@@ -68,9 +70,30 @@ fun CareReminderNavGraph() {
         composable<HomeRoute> {
 
             HomeScreen(
-
                 onAddTaskClick = {
-                    navController.navigate(AddTaskRoute)
+                    navController.navigate(
+                        AddTaskRoute()
+                    )
+                },
+                onEditTask = { taskId ->
+                    navController.navigate(
+                        AddTaskRoute(taskId)
+                    )
+                }
+            )
+        }
+
+        composable<AddTaskRoute> { backStackEntry ->
+
+            val route = backStackEntry.toRoute<AddTaskRoute>()
+
+            AddTaskScreen(
+                taskId = route.taskId,
+                onTaskSaved = {
+                    navController.popBackStack()
+                },
+                onTaskDeleted = {
+                    navController.popBackStack()
                 }
             )
         }

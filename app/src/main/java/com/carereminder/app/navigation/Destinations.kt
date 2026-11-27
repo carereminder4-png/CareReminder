@@ -12,4 +12,6 @@ object AuthRoute
 object HomeRoute
 
 @Serializable
-object AddTaskRoute
+data class AddTaskRoute(
+    val taskId: String? = null
+)
